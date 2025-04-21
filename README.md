@@ -1,1 +1,3 @@
 # carousel-component
+
+In order to test the shopify section, please visit: https://quickstart-d4bec40c.myshopify.com/?_ab=0&_bt=eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaVp4ZFdsamEzTjBZWEowTFdRMFltVmpOREJqTG0xNWMyaHZjR2xtZVM1amIyMEdPZ1pGVkE9PSIsImV4cCI6IjIwMjUtMDQtMjFUMTk6MjA6NDYuMjYxWiIsInB1ciI6InBlcm1hbmVudF9wYXNzd29yZF9ieXBhc3MifX0%3D--76ed63ba4a5ce8dd7e8130bf88b0d7ee486d2dbb&_fd=0&_sc=1&key=f2c31c5cf6c8a3da3da969494a52fc64c0cedefe1ff5353b4b7e86dfe7cda9c0&preview_theme_id=176697475352 
