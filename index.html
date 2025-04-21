@@ -13,7 +13,10 @@
             <h2 class="text-3xl font-black font-serif">Best Sellers</h2>
             <a href="#" class="hidden md:inline text-sm text-gray-500 hover:underline">Shop all Best Sellers →</a>
          </div>
-        
+         <!-- Product Grid  -->
+         <div class="relative">
+            <!-- Adds custom scrollbar -->
+            <div id="scrollable" class="ml-8 pr-6 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-8">
                <div class="mobile-card grid transition duration-300 md:w-64 shrink-0 overflow-hidden group snap-start">
                   <div class="relative overflow-hidden rounded-lg w-full aspect-square ">
                      <img src="../carousel-component/images/tshirt-1.jpg" class="size-full object-cover">
@@ -161,7 +164,11 @@
                      <p class="mt-1 text-xs font-semibold">$59.99</p>
                   </div>
                </div>
-           
+            </div>
+            <div class="ml-8" id="custom-track">
+               <div id="custom-thumb"></div>
+            </div>
+         </div>
          <!-- Show More Button -->
          <div class="mt-1 sm:hidden text-center">
             <button id="showMoreBtn"
