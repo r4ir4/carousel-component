@@ -1,0 +1,161 @@
+{{ 'carousel-component.css' | asset_url | stylesheet_tag }}
+<script src="https://cdn.tailwindcss.com"></script> //adding hardcoded tailwindcss CDN for testing purposes
+
+<section class="py-8">
+    <div class="mx-8 flex flex-col items-center text-center mb-4 md:flex-row md:justify-between md:text-left md:items-start">
+      <h2 class="text-4xl font-black font-serif">{{section.settings.title}}</h2>
+      <a href="{{section.settings.button_link}}" class="md:inline text-m text-gray-500 hover:underline">{{section.settings.button_text}}</a>
+    </div>
+  
+    <div class="relative">
+      <div id="scrollable" class="ml-8 pr-6 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-8">
+        {% for product in collections[section.settings.collection].products limit: 10 %}
+          {% assign index = forloop.index0 %}
+            {% assign hidden_mobile = '' %}
+            {% if index >= 4 %}
+                {% assign hidden_mobile = 'hidden-mobile' %}
+            {% endif %}
+          <a href="{{ product.url }}" class="mobile-card grid transition duration-300 md:w-[29rem] shrink-0 overflow-hidden group snap-start no-underline text-inherit {{ hidden_mobile }}">
+            <div class="relative overflow-hidden rounded-lg w-full aspect-square">
+              <img src="{{ product.images[0]  | img_url: '600x600' }}" class="size-full object-cover">
+              {% if product.images[1] %}
+                <img src="{{ product.images[1] | img_url: '600x600' }}" class="size-full object-cover absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition duration-300">
+              {% endif %}
+              {% if product.tags contains 'best' %} // checking for product tags to add the custom badges
+                <span class="absolute top-4 left-2 border border-black text-black bg-white text-[12px] font-bold tracking-wide px-2.5 py-0.5 rounded-full">
+                  BEST SELLER
+                </span>
+              {% endif %}
+              
+              {% if product.tags contains '15off' %} // checking for product tags to add the custom badges
+                <span class="absolute top-4 right-2 border border-black text-white bg-[#445f4a] text-[12px] font-bold tracking-wide px-2.5 py-0.5 rounded-full">
+                  SAVE 15%
+                </span>
+              {% endif %}
+            </div>
+            <div class="pt-0 pl-2">
+              <h3 class="text-l font-bold">{{ product.title }}</h3>
+              {% if product.description != blank %} // adding this for testing purposes as I haven't installed any review app
+                <p class="mt-1 text-m text-gray-500">{{ product.description | strip_html | truncate: 100 }}</p>
+              {% endif %}
+              <p class="mt-1 text-m font-semibold">{{ product.price | money }}</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+  
+      <div class="ml-8" id="custom-track">
+        <div id="custom-thumb">.</div>
+      </div>
+    </div>
+  
+    <div class="mt-1 sm:hidden text-center">
+      <button id="showMoreBtn" class="w-96 bg-[#1a1a1a] text-white text-base font-semibold px-10 py-3 rounded-full transition duration-300 hover:bg-black">Show More</button>
+    </div>
+  </section>
+
+  {% schema %}
+{
+  "name": "Best Sellers Carousel",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Best Sellers"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link to all products",
+      "default": "/collections/all"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Link text",
+      "default": "Shop all Best Sellers →"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Best Sellers Carousel",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+<script>
+// Adding custom JS for the carousel component inside the liquid file since it's not reused anywhere - Shopify's best practices!
+// Show More Button Logic
+document.getElementById('showMoreBtn').addEventListener('click', function () {
+    document.querySelectorAll('.mobile-card.hidden-mobile').forEach(card => {
+      card.classList.remove('hidden-mobile');
+    });
+    this.style.display = 'none';
+  });
+  
+  // Custom Scrollbar Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const scrollContent = document.getElementById('scrollable');
+    const customTrack = document.getElementById('custom-track');
+    const customThumb = document.getElementById('custom-thumb');
+  
+    const updateThumb = () => {
+      const visibleRatio = scrollContent.clientWidth / scrollContent.scrollWidth;
+      customThumb.style.width = `${visibleRatio * 100}%`;
+  
+      const scrollRatio = scrollContent.scrollLeft / (scrollContent.scrollWidth - scrollContent.clientWidth);
+      const trackWidth = customTrack.clientWidth;
+      const thumbWidth = customThumb.clientWidth;
+      const left = scrollRatio * (trackWidth - thumbWidth);
+      customThumb.style.transform = `translateX(${left}px)`;
+    };
+  
+    let isDragging = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+  
+    customThumb.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.pageX;
+      startScrollLeft = scrollContent.scrollLeft;
+      customTrack.classList.add('active');
+      document.body.classList.add('no-select');
+    });
+  
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.pageX - startX;
+      const ratio = scrollContent.scrollWidth / customTrack.clientWidth;
+      scrollContent.scrollLeft = startScrollLeft + dx * ratio;
+    });
+  
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      customTrack.classList.remove('active');
+      document.body.classList.remove('no-select');
+    });
+  
+    customTrack.addEventListener('click', (e) => {
+      if (e.target === customThumb) return;
+      const trackRect = customTrack.getBoundingClientRect();
+      const clickX = e.clientX - trackRect.left;
+      const trackWidth = customTrack.clientWidth;
+      const ratio = clickX / trackWidth;
+      scrollContent.scrollLeft = ratio * (scrollContent.scrollWidth - scrollContent.clientWidth);
+    });
+  
+    scrollContent.addEventListener('scroll', updateThumb);
+    window.addEventListener('resize', updateThumb);
+  
+    updateThumb();
+  });
+  
+</script>
